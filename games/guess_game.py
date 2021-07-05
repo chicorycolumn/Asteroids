@@ -1,22 +1,26 @@
 from random import randint
+from games.common import validate_integer
 
 
-def play():
+def guess_game():
     def give_hints(secret_number, guess_number):
+        if guess_number == 1:
+            return
         if not secret_number % guess_number:
             print("But my number is divisible by that.")
         if not guess_number % secret_number:
             print("But that is a multiple of my number.")
 
-    secret_number = randint(0, 100)
-
-    print("The games begins! I'm thinking of a number between 1 and 100.")
+    secret_number = randint(1, 50)
+    print("The games begins! I'm thinking of a number between 1 and 50.")
 
     while True:
-        guess_number = int(input("Please guess:"))
+        guess_number = validate_integer(input("Please guess:"))
+        if guess_number == None:
+            continue
 
-        if guess_number < 0 or guess_number > 100:
-            print("No, silly. Between 1 and 100.")
+        if guess_number < 1 or guess_number > 50:
+            print("No, silly. Between 1 and 50.")
             continue
 
         if guess_number < secret_number:
@@ -32,7 +36,3 @@ def play():
         if guess_number == secret_number:
             print("You win!")
             break
-
-
-if __name__ == "__main__":
-    play()
