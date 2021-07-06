@@ -2,7 +2,7 @@ from random import randint
 from games.common import validate_integer
 
 
-def guess_game():
+def guess_game(score):
     def give_hints(secret_number, guess_number):
         if guess_number == 1:
             return
@@ -34,5 +34,7 @@ def guess_game():
             continue
 
         if guess_number == secret_number:
-            print("You win!")
+            additional_score = 5
+            score["value"] += additional_score
+            print(f"You win! You just scored {additional_score} and your total is {score['value']}")
             break
