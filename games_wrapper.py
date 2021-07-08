@@ -10,8 +10,14 @@ def play():
         if to_play_response.lower() == "g":
             guess_game(score)
             continue
+        if to_play_response.lower() == "gg":
+            guess_game(score=score, cheat=True)
+            continue
         if to_play_response.lower() == "q":
             quick_maths(score)
+            continue
+        if to_play_response.lower() == "qq":
+            quick_maths(score=score, cheat=True)
             continue
         elif to_play_response.lower() == "x":
             print("Goodbye!")
