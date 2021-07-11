@@ -33,8 +33,16 @@ class GameObject:
 
 
 class Asteroid(GameObject):
-    def __init__(self, position):
-        sprite = load_sprite("asteroid")
+    size_to_scale = {
+        3: 1,
+        2: 0.5,
+        1: 0.25
+    }
+
+    def __init__(self, position, create_asteroid_cb, size=3):
+        self.create_asteroid_cb = create_asteroid_cb
+        self.size = size
+        sprite = rotozoom(load_sprite("asteroid"), 0, self.size_to_scale[self.size])
         velocity = get_random_velocity(1, 10)
         self.direction = Vector2(UP)
         self.rotation_angle = choice([num for num in range(-20, 20) if num])
@@ -46,6 +54,17 @@ class Asteroid(GameObject):
     def draw(self, surface):
         self.direction.rotate_ip(self.rotation_angle)
         super().draw_with_rotation(surface)
+
+    def explode(self):
+        def explode_inner(quantity, size):
+            for _ in range(quantity):
+                ast = Asteroid(self.position, self.create_asteroid_cb, size)
+                self.create_asteroid_cb(ast)
+
+        if self.size == 3:
+            explode_inner(2, self.size - 1)
+        elif self.size == 2:
+            explode_inner(4, self.size - 1)
 
 
 class Spaceship(GameObject):

@@ -26,7 +26,7 @@ class Asteroids:
                 ):
                     break
 
-            self.asteroids.append(Asteroid(position))
+            self.asteroids.append(Asteroid(position, self.asteroids.append))
 
     def get_game_objects(self):
         game_objects = [*self.asteroids, *self.bullets]
@@ -82,6 +82,7 @@ class Asteroids:
         for bullet in self.bullets[:]:
             for asteroid in self.asteroids[:]:
                 if bullet.collides_with(asteroid):
+                    asteroid.explode()
                     self.asteroids.remove(asteroid)
                     self.bullets.remove(bullet)
                     break
