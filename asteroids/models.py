@@ -33,15 +33,19 @@ class GameObject:
 
 
 class Asteroid(GameObject):
-    direction = Vector2(UP)
-
     def __init__(self, position):
         sprite = load_sprite("asteroid")
         velocity = get_random_velocity(1, 10)
+        self.direction = Vector2(UP)
+        self.rotation_angle = choice([num for num in range(-20, 20) if num])
         super().__init__(position, sprite, velocity)
 
     def move(self, surface):
         super().move(surface)
+
+    def draw(self, surface):
+        self.direction.rotate_ip(self.rotation_angle)
+        super().draw_with_rotation(surface)
 
 
 class Spaceship(GameObject):
@@ -50,8 +54,9 @@ class Spaceship(GameObject):
     ACCELERATION = 0.25
     BULLET_SPEED = 3
 
-    def __init__(self, position, create_bullet_cb):
-        self.create_bullet_cb = create_bullet_cb
+    def __init__(self, position):
+    # def __init__(self, position, create_bullet_cb):
+    #     self.create_bullet_cb = create_bullet_cb
         self.direction = Vector2(UP)
 
         sprite = load_sprite("spaceship")
