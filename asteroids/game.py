@@ -1,27 +1,27 @@
 import pygame
 from utils import load_sprite
 from models import GameObject
-from models import Spaceship, Asteroid
-from utils import load_sprite, wrap_position, slow_down_velocity, get_random_position
+from models import Ship, Asteroid
+from utils import load_sprite, wrap_position, decelerate, get_random_position
 
 
 class Asteroids:
 
     def __init__(self):
         self._init_pygame()
-        self.screen = pygame.display.set_mode((800, 600))
-        self.background = load_sprite("space", False)
+        self.screen = pygame.display.set_mode((1250, 850))
+        self.background = load_sprite("galaxy", False, True)
         self.clock = pygame.time.Clock()
         self.MIN_ASTEROID_DISTANCE = 150
         self.asteroids = []
         self.bullets = []
-        self.spaceship = Spaceship((400, 300), self.bullets.append)
+        self.ship = Ship((400, 300), self.bullets.append)
 
         for _ in range(4):
             while True:
                 position = get_random_position(self.screen)
                 if (
-                        position.distance_to(self.spaceship.position)
+                        position.distance_to(self.ship.position)
                         > self.MIN_ASTEROID_DISTANCE
                 ):
                     break
@@ -31,8 +31,8 @@ class Asteroids:
     def get_game_objects(self):
         game_objects = [*self.asteroids, *self.bullets]
 
-        if self.spaceship:
-            game_objects.append(self.spaceship)
+        if self.ship:
+            game_objects.append(self.ship)
 
         return game_objects
 
@@ -50,29 +50,29 @@ class Asteroids:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 quit()
-            elif self.spaceship and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.spaceship.shoot()
+            elif self.ship and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.ship.shoot()
 
         is_key_pressed = pygame.key.get_pressed()
 
-        if self.spaceship:
+        if self.ship:
             if is_key_pressed[pygame.K_RIGHT]:
-                self.spaceship.rotate(clockwise=True)
+                self.ship.rotate(clockwise=True)
             elif is_key_pressed[pygame.K_LEFT]:
-                self.spaceship.rotate(clockwise=False)
+                self.ship.rotate(clockwise=False)
             elif is_key_pressed[pygame.K_UP]:
-                self.spaceship.accelerate()
+                self.ship.accelerate()
             # elif is_key_pressed[pygame.K_SPACE]:
-            #     self.spaceship.shoot()
+            #     self.ship.shoot()
 
     def _process_game_logic(self):
         for g_obj in self.get_game_objects():
             g_obj.move(self.screen)
 
-        if self.spaceship:
+        if self.ship:
             for asteroid in self.asteroids:
-                if asteroid.collides_with(self.spaceship):
-                    self.spaceship = None
+                if asteroid.collides_with(self.ship):
+                    self.ship = None
                     break
 
         for bullet in self.bullets[:]:
@@ -84,7 +84,7 @@ class Asteroids:
                 if bullet.collides_with(asteroid):
                     asteroid.explode()
                     self.asteroids.remove(asteroid)
-                    if not self.spaceship.powerups["hard_bullets"]:
+                    if not self.ship.powerups["hard_bullets"]:
                         self.bullets.remove(bullet)
                     break
 

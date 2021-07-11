@@ -1,6 +1,6 @@
 from pygame.math import Vector2
 from pygame.transform import rotozoom
-from utils import load_sprite, wrap_position, slow_down_velocity, get_random_position, get_random_velocity
+from utils import load_sprite, wrap_position, decelerate, get_random_position, get_random_velocity
 from random import randint, choice
 
 UP = Vector2(0, -1)
@@ -33,17 +33,17 @@ class GameObject:
 
 
 class Asteroid(GameObject):
-    size_to_scale = {
-        3: 1,
-        2: 0.5,
-        1: 0.25
+    properties_by_rank = {
+        1: {"scale": 1, "max_speed": 4},
+        2: {"scale": 0.5, "max_speed": 8},
+        3: {"scale": 0.25, "max_speed": 16},
     }
 
-    def __init__(self, position, create_asteroid_cb, size=3):
+    def __init__(self, position, create_asteroid_cb, rank=1):
         self.create_asteroid_cb = create_asteroid_cb
-        self.size = size
-        sprite = rotozoom(load_sprite("asteroid"), 0, self.size_to_scale[self.size])
-        velocity = get_random_velocity(1, 10)
+        self.rank = rank
+        sprite = rotozoom(load_sprite("asteroid"), 0, self.properties_by_rank[self.rank]["scale"])
+        velocity = get_random_velocity(1, self.properties_by_rank[self.rank]["max_speed"])
         self.direction = Vector2(UP)
         self.rotation_angle = choice([num for num in range(-20, 20) if num])
         super().__init__(position, sprite, velocity)
@@ -56,20 +56,20 @@ class Asteroid(GameObject):
         super().draw_with_rotation(surface)
 
     def explode(self):
-        def explode_inner(quantity, size):
+        def explode_inner(quantity, rank):
             for _ in range(quantity):
-                ast = Asteroid(self.position, self.create_asteroid_cb, size)
+                ast = Asteroid(self.position, self.create_asteroid_cb, rank)
                 self.create_asteroid_cb(ast)
 
-        if self.size == 3:
-            explode_inner(2, self.size - 1)
-        elif self.size == 2:
-            explode_inner(4, self.size - 1)
+        if self.rank == 1:
+            explode_inner(2, self.rank + 1)
+        elif self.rank == 2:
+            explode_inner(4, self.rank + 1)
 
 
-class Spaceship(GameObject):
+class Ship(GameObject):
     MANOEUVRABILITY = 7
-    ACCELERATION = 0.25
+    ACCELERATION = 0.75
     BULLET_SPEED = 10
 
     def __init__(self, position, create_bullet_cb):
@@ -78,7 +78,7 @@ class Spaceship(GameObject):
         self.powerups = {
             "fast_bullets": False,
             "triple_bullets": False,
-            "hard_bullets": True
+            "hard_bullets": False
         }
 
         sprite = load_sprite("spaceship")
@@ -97,7 +97,7 @@ class Spaceship(GameObject):
         self.velocity += self.direction * self.ACCELERATION
 
     def move(self, surface):
-        slow_down_velocity(self.velocity)
+        decelerate(self.velocity)
         super().move(surface)
 
     def shoot(self):

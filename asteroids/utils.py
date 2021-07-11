@@ -3,8 +3,8 @@ from pygame.math import Vector2
 import random
 
 
-def load_sprite(name, with_alpha=True):
-    path = f"asteroids/assets/sprites/{name}.png"
+def load_sprite(name, with_alpha=True, is_jpg=False):
+    path = f"asteroids/assets/sprites/{name}.{'jpg' if is_jpg else 'png'}"
     loaded_sprite = load(path)
 
     if with_alpha:
@@ -32,7 +32,7 @@ def wrap_position(position, surface):
     return Vector2(x % w, y % h)
 
 
-def slow_down_velocity(vel):
+def decelerate(vel):
     def slowed(point):
         return 0 if 0.01 > point > -0.01 else point * 0.99
 
