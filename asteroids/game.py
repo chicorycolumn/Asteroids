@@ -11,7 +11,14 @@ class Asteroids:
         self.background = load_sprite("space", False)
         self.clock = pygame.time.Clock()
         self.spaceship = Spaceship((400, 300))
-        self.asteroid = Asteroid((200, 150))
+        self.asteroids = []
+        ast1 = Asteroid(self.screen, -1)
+        ast2 = Asteroid(self.screen, -50)
+        self.asteroids.append(ast1)
+        self.asteroids.append(ast2)
+
+    def get_game_objects(self):
+        return [self.spaceship, *self.asteroids]
 
     def main_loop(self):
         while True:
@@ -38,12 +45,12 @@ class Asteroids:
             self.spaceship.accelerate()
 
     def _process_game_logic(self):
-        self.spaceship.move(self.screen)
-        self.asteroid.move(self.screen)
+        for g_obj in self.get_game_objects():
+            g_obj.move(self.screen)
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
-        self.spaceship.draw(self.screen)
-        self.asteroid.draw(self.screen)
+        for g_obj in self.get_game_objects():
+            g_obj.draw(self.screen)
         pygame.display.flip()
-        self.clock.tick(60)
+        self.clock.tick(30)

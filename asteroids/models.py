@@ -2,6 +2,7 @@ from pygame.math import Vector2
 from pygame.transform import rotozoom
 from utils import load_sprite, wrap_position, slow_down_velocity
 from random import randint, choice
+import time
 
 UP = Vector2(0, -1)
 
@@ -17,6 +18,13 @@ class GameObject:
         blit_position = self.position - Vector2(self.radius)
         surface.blit(self.sprite, blit_position)
 
+    def draw_with_rotation(self, surface):
+        angle = self.direction.angle_to(UP)
+        rotated_surface = rotozoom(self.sprite, angle, 1.0)
+        rotated_surface_size = Vector2(rotated_surface.get_size())
+        blit_position = self.position - rotated_surface_size * 0.5
+        surface.blit(rotated_surface, blit_position)
+
     def move(self, surface):
         self.position = wrap_position(self.position + self.velocity, surface)
 
@@ -27,23 +35,26 @@ class GameObject:
 
 class Asteroid(GameObject):
     direction = Vector2(UP)
-    sign = choice([num for num in range(-5, 5) if num])
 
-    def __init__(self, position):
+    def __init__(self, surface, sign):
+
+        # self.sign = choice([num for num in range(-50, 50) if num])
+        print("init sign", sign)
+        self.sign = sign
+        w, h = surface.get_size()
+        x = choice(range(w))
+        y = choice(range(h))
+        position = (x, y)
         sprite = load_sprite("asteroid")
         super().__init__(position, sprite, Vector2(0))
 
     def move(self, surface):
-        self.direction.rotate_ip(self.sign)
         super().move(surface)
 
     def draw(self, surface):
-        angle = self.direction.angle_to(UP)
-        print("asteroid angle to up", angle)
-        rotated_surface = rotozoom(self.sprite, angle, 1.0)
-        rotated_surface_size = Vector2(rotated_surface.get_size())
-        blit_position = self.position - rotated_surface_size * 0.5
-        surface.blit(rotated_surface, blit_position)
+        print("----self.sign", self.sign)
+        self.direction.rotate_ip(self.sign)
+        super().draw_with_rotation(surface)
 
 
 class Spaceship(GameObject):
@@ -64,16 +75,11 @@ class Spaceship(GameObject):
         self.direction.rotate_ip(angle)
 
     def draw(self, surface):
-        angle = self.direction.angle_to(UP)
-        rotated_surface = rotozoom(self.sprite, angle, 1.0)
-        rotated_surface_size = Vector2(rotated_surface.get_size())
-        blit_position = self.position - rotated_surface_size * 0.5
-        surface.blit(rotated_surface, blit_position)
+        super().draw_with_rotation(surface)
 
     def accelerate(self):
         self.velocity += self.direction * self.ACCELERATION
 
     def move(self, surface):
         slow_down_velocity(self.velocity)
-
         super().move(surface)
