@@ -64,7 +64,6 @@ class Spaceship(GameObject):
     def rotate(self, clockwise=True):
         sign = 1 if clockwise else -1
         angle = self.MANOEUVRABILITY * sign
-        print("angle", angle)
         self.direction.rotate_ip(angle)
 
     def draw(self, surface):

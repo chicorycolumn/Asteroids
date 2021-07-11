@@ -35,7 +35,6 @@ def wrap_position(position, surface):
 def is_offscreen(game_object, surface):
     x, y = game_object.position
     w, h = surface.get_size()
-    print(f"x{x}, y{y}, width{w}, height{h}")
     return (x < 0 or x > w) or (y < 0 or y > h)
 
 
