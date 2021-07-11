@@ -17,7 +17,7 @@ class Asteroids:
         self.bullets = []
         self.spaceship = Spaceship((400, 300), self.bullets.append)
 
-        for _ in range(2):
+        for _ in range(4):
             while True:
                 position = get_random_position(self.screen)
                 if (
