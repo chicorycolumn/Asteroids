@@ -1,8 +1,7 @@
 from pygame.math import Vector2
 from pygame.transform import rotozoom
-from utils import load_sprite, wrap_position, slow_down_velocity
+from utils import load_sprite, wrap_position, slow_down_velocity, get_random_position, get_random_velocity
 from random import randint, choice
-import time
 
 UP = Vector2(0, -1)
 
@@ -36,26 +35,26 @@ class GameObject:
 class Asteroid(GameObject):
     direction = Vector2(UP)
 
-    def __init__(self, surface):
-        w, h = surface.get_size()
-        x = choice(range(w))
-        y = choice(range(h))
-        position = (x, y)
+    def __init__(self, position):
         sprite = load_sprite("asteroid")
-        super().__init__(position, sprite, Vector2(0))
+        velocity = get_random_velocity(1, 10)
+        super().__init__(position, sprite, velocity)
 
     def move(self, surface):
         super().move(surface)
 
 
 class Spaceship(GameObject):
-    direction = Vector2(UP)
+
     MANOEUVRABILITY = 7
     ACCELERATION = 0.25
+    BULLET_SPEED = 3
 
-    def __init__(self, position, sprite=None):
-        if not sprite:
-            sprite = load_sprite("spaceship")
+    def __init__(self, position, create_bullet_cb):
+        self.create_bullet_cb = create_bullet_cb
+        self.direction = Vector2(UP)
+
+        sprite = load_sprite("spaceship")
 
         super().__init__(position, sprite, Vector2(0))
 
@@ -74,3 +73,13 @@ class Spaceship(GameObject):
     def move(self, surface):
         slow_down_velocity(self.velocity)
         super().move(surface)
+
+    def shoot(self):
+        bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
+        bullet = Bullet(self.position, bullet_velocity)
+        self.create_bullet_callback(bullet)
+
+
+class Bullet(GameObject):
+    def __init__(self, position, velocity):
+        super().__init__(position, load_sprite("bullet"), velocity)
