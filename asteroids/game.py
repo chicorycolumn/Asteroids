@@ -2,7 +2,7 @@ import pygame
 from utils import load_sprite
 from models import GameObject
 from models import Spaceship, Asteroid
-from utils import load_sprite, wrap_position, slow_down_velocity, get_random_position, is_offscreen
+from utils import load_sprite, wrap_position, slow_down_velocity, get_random_position
 
 
 class Asteroids:
@@ -75,14 +75,20 @@ class Asteroids:
                     self.spaceship = None
                     break
 
-        for bullet in self.bullets:
-            if is_offscreen(bullet, self.screen):
-                del self.bullets[self.bullets.index(bullet)]
+        for bullet in self.bullets[:]:
+            if not self.screen.get_rect().collidepoint(bullet.position):
+                self.bullets.remove(bullet)
+
+        for bullet in self.bullets[:]:
+            for asteroid in self.asteroids[:]:
+                if bullet.collides_with(asteroid):
+                    self.asteroids.remove(asteroid)
+                    self.bullets.remove(bullet)
+                    break
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
         for g_obj in self.get_game_objects():
             g_obj.draw(self.screen)
         pygame.display.flip()
-        print(len(self.bullets))
         self.clock.tick(30)
