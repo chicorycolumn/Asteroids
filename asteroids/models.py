@@ -75,6 +75,11 @@ class Spaceship(GameObject):
     def __init__(self, position, create_bullet_cb):
         self.create_bullet_cb = create_bullet_cb
         self.direction = Vector2(UP)
+        self.powerups = {
+            "fast_bullets": False,
+            "triple_bullets": False,
+            "hard_bullets": True
+        }
 
         sprite = load_sprite("spaceship")
 
@@ -96,14 +101,23 @@ class Spaceship(GameObject):
         super().move(surface)
 
     def shoot(self):
-        self.shoot_triple()
+        if self.powerups["triple_bullets"]:
+            self.shoot_triple()
+        else:
+            self.shoot_simple()
 
     def shoot_simple(self):
-        bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
+
+        bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_bullets"] else self.BULLET_SPEED
+
+        bullet_velocity = self.direction * bullet_speed + self.velocity
         bullet = Bullet(self.position, bullet_velocity)
         self.create_bullet_cb(bullet)
 
     def shoot_triple(self):
+
+        bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_bullets"] else self.BULLET_SPEED
+
         def chiralise_direction(direction, is_left):
             if abs(direction[0] / direction[1]) > 1:
                 return Vector2([direction[0], direction[1] + 0.5]) if is_left \
@@ -112,10 +126,10 @@ class Spaceship(GameObject):
                 return Vector2([direction[0] + 0.5, direction[1]]) if is_left \
                     else Vector2([direction[0] - 0.5, direction[1]])
 
-        bullet_velocity_L = chiralise_direction(self.direction, True) * (self.BULLET_SPEED * 1.15) + self.velocity
+        bullet_velocity_L = chiralise_direction(self.direction, True) * (bullet_speed * 1.15) + self.velocity
         bullet_L = Bullet(self.position, bullet_velocity_L)
 
-        bullet_velocity_R = chiralise_direction(self.direction, False) * (self.BULLET_SPEED * 1.15) + self.velocity
+        bullet_velocity_R = chiralise_direction(self.direction, False) * (bullet_speed * 1.15) + self.velocity
         bullet_R = Bullet(self.position, bullet_velocity_R)
 
         self.create_bullet_cb(bullet_L)
