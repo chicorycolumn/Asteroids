@@ -49,14 +49,12 @@ class Asteroid(GameObject):
 
 
 class Spaceship(GameObject):
-
     MANOEUVRABILITY = 7
     ACCELERATION = 0.25
-    BULLET_SPEED = 3
+    BULLET_SPEED = 10
 
-    def __init__(self, position):
-    # def __init__(self, position, create_bullet_cb):
-    #     self.create_bullet_cb = create_bullet_cb
+    def __init__(self, position, create_bullet_cb):
+        self.create_bullet_cb = create_bullet_cb
         self.direction = Vector2(UP)
 
         sprite = load_sprite("spaceship")
@@ -82,9 +80,12 @@ class Spaceship(GameObject):
     def shoot(self):
         bullet_velocity = self.direction * self.BULLET_SPEED + self.velocity
         bullet = Bullet(self.position, bullet_velocity)
-        self.create_bullet_callback(bullet)
+        self.create_bullet_cb(bullet)
 
 
 class Bullet(GameObject):
     def __init__(self, position, velocity):
         super().__init__(position, load_sprite("bullet"), velocity)
+
+    def move(self, surface):
+        self.position = self.position + self.velocity

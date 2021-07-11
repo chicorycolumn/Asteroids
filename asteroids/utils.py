@@ -32,6 +32,13 @@ def wrap_position(position, surface):
     return Vector2(x % w, y % h)
 
 
+def is_offscreen(game_object, surface):
+    x, y = game_object.position
+    w, h = surface.get_size()
+    print(f"x{x}, y{y}, width{w}, height{h}")
+    return (x < 0 or x > w) or (y < 0 or y > h)
+
+
 def slow_down_velocity(vel):
     def slowed(point):
         return 0 if 0.01 > point > -0.01 else point * 0.99

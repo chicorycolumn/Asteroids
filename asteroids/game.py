@@ -2,22 +2,22 @@ import pygame
 from utils import load_sprite
 from models import GameObject
 from models import Spaceship, Asteroid
-from utils import load_sprite, wrap_position, slow_down_velocity, get_random_position
+from utils import load_sprite, wrap_position, slow_down_velocity, get_random_position, is_offscreen
 
 
 class Asteroids:
+
     def __init__(self):
         self._init_pygame()
         self.screen = pygame.display.set_mode((800, 600))
         self.background = load_sprite("space", False)
         self.clock = pygame.time.Clock()
-        self.spaceship = Spaceship((400, 300))
         self.MIN_ASTEROID_DISTANCE = 150
         self.asteroids = []
         self.bullets = []
-        self.spaceship = Spaceship((400, 300))
+        self.spaceship = Spaceship((400, 300), self.bullets.append)
 
-        for _ in range(6):
+        for _ in range(2):
             while True:
                 position = get_random_position(self.screen)
                 if (
@@ -27,7 +27,6 @@ class Asteroids:
                     break
 
             self.asteroids.append(Asteroid(position))
-
 
     def get_game_objects(self):
         game_objects = [*self.asteroids, *self.bullets]
@@ -51,6 +50,8 @@ class Asteroids:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 quit()
+            elif self.spaceship and event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.spaceship.shoot()
 
         is_key_pressed = pygame.key.get_pressed()
 
@@ -61,6 +62,8 @@ class Asteroids:
                 self.spaceship.rotate(clockwise=False)
             elif is_key_pressed[pygame.K_UP]:
                 self.spaceship.accelerate()
+            # elif is_key_pressed[pygame.K_SPACE]:
+            #     self.spaceship.shoot()
 
     def _process_game_logic(self):
         for g_obj in self.get_game_objects():
@@ -72,9 +75,14 @@ class Asteroids:
                     self.spaceship = None
                     break
 
+        for bullet in self.bullets:
+            if is_offscreen(bullet, self.screen):
+                del self.bullets[self.bullets.index(bullet)]
+
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
         for g_obj in self.get_game_objects():
             g_obj.draw(self.screen)
         pygame.display.flip()
+        print(len(self.bullets))
         self.clock.tick(30)
