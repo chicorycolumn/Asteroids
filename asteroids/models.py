@@ -36,11 +36,7 @@ class GameObject:
 class Asteroid(GameObject):
     direction = Vector2(UP)
 
-    def __init__(self, surface, sign):
-
-        # self.sign = choice([num for num in range(-50, 50) if num])
-        print("init sign", sign)
-        self.sign = sign
+    def __init__(self, surface):
         w, h = surface.get_size()
         x = choice(range(w))
         y = choice(range(h))
@@ -50,11 +46,6 @@ class Asteroid(GameObject):
 
     def move(self, surface):
         super().move(surface)
-
-    def draw(self, surface):
-        print("----self.sign", self.sign)
-        self.direction.rotate_ip(self.sign)
-        super().draw_with_rotation(surface)
 
 
 class Spaceship(GameObject):

@@ -11,11 +11,7 @@ class Asteroids:
         self.background = load_sprite("space", False)
         self.clock = pygame.time.Clock()
         self.spaceship = Spaceship((400, 300))
-        self.asteroids = []
-        ast1 = Asteroid(self.screen, -1)
-        ast2 = Asteroid(self.screen, -50)
-        self.asteroids.append(ast1)
-        self.asteroids.append(ast2)
+        self.asteroids = [Asteroid(self.screen) for _ in range(0, 6)]
 
     def get_game_objects(self):
         return [self.spaceship, *self.asteroids]
