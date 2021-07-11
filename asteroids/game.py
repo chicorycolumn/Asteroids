@@ -84,7 +84,7 @@ class Asteroids:
                 if bullet.collides_with(asteroid):
                     asteroid.explode()
                     self.asteroids.remove(asteroid)
-                    if not self.ship.powerups["hard_bullets"]:
+                    if not self.ship.powerups["piercing_shoot"]:
                         self.bullets.remove(bullet)
                     break
 

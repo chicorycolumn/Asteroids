@@ -76,9 +76,10 @@ class Ship(GameObject):
         self.create_bullet_cb = create_bullet_cb
         self.direction = Vector2(UP)
         self.powerups = {
-            "fast_bullets": False,
-            "triple_bullets": False,
-            "hard_bullets": False
+            "fast_shoot": False,
+            "triple_shoot": False,
+            "piercing_shoot": False,
+
         }
 
         sprite = load_sprite("spaceship")
@@ -101,14 +102,14 @@ class Ship(GameObject):
         super().move(surface)
 
     def shoot(self):
-        if self.powerups["triple_bullets"]:
+        if self.powerups["triple_shoot"]:
             self.shoot_triple()
         else:
             self.shoot_simple()
 
     def shoot_simple(self):
 
-        bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_bullets"] else self.BULLET_SPEED
+        bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_shoot"] else self.BULLET_SPEED
 
         bullet_velocity = self.direction * bullet_speed + self.velocity
         bullet = Bullet(self.position, bullet_velocity)
@@ -116,7 +117,7 @@ class Ship(GameObject):
 
     def shoot_triple(self):
 
-        bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_bullets"] else self.BULLET_SPEED
+        bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_shoot"] else self.BULLET_SPEED
 
         def chiralise_direction(direction, is_left):
             if abs(direction[0] / direction[1]) > 1:
@@ -140,6 +141,27 @@ class Ship(GameObject):
 class Bullet(GameObject):
     def __init__(self, position, velocity):
         super().__init__(position, load_sprite("bullet"), velocity)
+
+    def move(self, surface):
+        self.position = self.position + self.velocity
+
+
+class Powerup(GameObject):
+    powerups_ref = {
+        1: {"label": "health", "name": "shield"},
+        2: {"label": "health", "name": "extra_life"},
+        3: {"label": "shoot", "name": "fast_shoot"},
+        4: {"label": "shoot", "name": "triple_shoot"},
+        5: {"label": "shoot", "name": "piercing_shoot"},
+        6: {"label": "shoot", "name": "plasma_shoot"},
+    }
+
+    def __init__(self):
+        self.type = randint(1, 6)
+
+        # position =
+
+        # super().__init__(position, load_sprite("powerup1"), Vector2(0, 2))
 
     def move(self, surface):
         self.position = self.position + self.velocity
