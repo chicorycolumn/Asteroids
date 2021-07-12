@@ -7,7 +7,7 @@ UP = Vector2(0, -1)
 
 
 class GameObject:
-    def __init__(self, position, sprite, velocity):
+    def __init__(self, position, sprite, velocity=(0, 0)):
         self.position = Vector2(position)
         self.sprite = sprite
         self.radius = sprite.get_width() / 2
@@ -179,12 +179,7 @@ class Powerup(GameObject):
         6: {"label": "shoot", "name": "boomerang_shoot"},
     }
 
-    def __init__(self):
+    def __init__(self, position):
         self.type = randint(1, 6)
-
-        # position =
-
-        # super().__init__(position, load_sprite("powerup1"), Vector2(0, 2))
-
-    def move(self, surface):
-        self.position = self.position + self.velocity
+        sprite = rotozoom(load_sprite(f"powerup_{self.type}"), 0, 1.25)
+        super().__init__(position, sprite)

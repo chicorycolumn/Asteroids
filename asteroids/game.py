@@ -1,7 +1,8 @@
 import pygame
 from utils import load_sprite
 from models import GameObject
-from models import Ship, Asteroid
+import time
+from models import Ship, Asteroid, Powerup
 from utils import load_sprite, wrap_position, decelerate, get_random_position
 
 
@@ -15,6 +16,7 @@ class Asteroids:
         self.MIN_ASTEROID_DISTANCE = 150
         self.asteroids = []
         self.bullets = []
+        self.powerups = []
         self.ship = Ship((400, 300), self.bullets.append)
 
         for _ in range(4):
@@ -29,7 +31,7 @@ class Asteroids:
             self.asteroids.append(Asteroid(position, self.asteroids.append))
 
     def get_game_objects(self):
-        game_objects = [*self.asteroids, *self.bullets]
+        game_objects = [*self.asteroids, *self.bullets, *self.powerups]
 
         if self.ship:
             game_objects.append(self.ship)
@@ -87,6 +89,18 @@ class Asteroids:
                     if not self.ship.powerups["piercing_shoot"]:
                         self.bullets.remove(bullet)
                     break
+
+        if int(str(time.time())[-3:]) < 10:
+            print("czas na wielkA siłE!")
+            while True:
+                position = get_random_position(self.screen)
+                if (
+                        position.distance_to(self.ship.position)
+                        > self.MIN_ASTEROID_DISTANCE
+                ):
+                    break
+
+            self.powerups.append(Powerup(position))
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
