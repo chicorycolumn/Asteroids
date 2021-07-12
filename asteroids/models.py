@@ -73,11 +73,11 @@ class Ship(GameObject):
         self.create_bullet_cb = create_bullet_cb
         self.direction = Vector2(UP)
         self.powerups = {
+            "shield": False,
             "fast_shoot": False,
             "triple_shoot": False,
             "piercing_shoot": False,
-            "boomerang_shoot": True,
-
+            "boomerang_shoot": False,
         }
 
         sprite = load_sprite("spaceship")
@@ -181,5 +181,6 @@ class Powerup(GameObject):
 
     def __init__(self, position):
         self.type = randint(1, 6)
-        sprite = rotozoom(load_sprite(f"powerup_{self.type}"), 0, 1.25)
+        self.properties = self.powerups_ref[self.type]
+        sprite = rotozoom(load_sprite(f"powerup_{self.type}"), 0, 2)
         super().__init__(position, sprite)

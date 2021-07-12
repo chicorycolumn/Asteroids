@@ -77,6 +77,23 @@ class Asteroids:
                     self.ship = None
                     break
 
+            for powerup in self.powerups:
+                if powerup.collides_with(self.ship):
+                    self.ship.powerups[powerup.properties["name"]] = True
+                    self.powerups.remove(powerup)
+                    break
+
+            if not len(self.powerups) and int(str(time.time())[-3:]) < 20:
+                while True:
+                    position = get_random_position(self.screen)
+                    if (
+                            position.distance_to(self.ship.position)
+                            > self.MIN_ASTEROID_DISTANCE
+                    ):
+                        break
+
+                self.powerups.append(Powerup(position))
+
         for bullet in self.bullets[:]:
             if not self.screen.get_rect().collidepoint(bullet.position):
                 self.bullets.remove(bullet)
@@ -90,17 +107,18 @@ class Asteroids:
                         self.bullets.remove(bullet)
                     break
 
-        if int(str(time.time())[-3:]) < 10:
-            print("czas na wielkA siłE!")
-            while True:
-                position = get_random_position(self.screen)
-                if (
-                        position.distance_to(self.ship.position)
-                        > self.MIN_ASTEROID_DISTANCE
-                ):
+            for powerup in self.powerups[:]:
+                if bullet.collides_with(powerup):
+                    self.powerups.remove(powerup)
                     break
 
-            self.powerups.append(Powerup(position))
+
+        for powerup in self.powerups[:]:
+            for asteroid in self.asteroids[:]:
+                if powerup.collides_with(asteroid):
+                    self.powerups.remove(powerup)
+                    break
+
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))
