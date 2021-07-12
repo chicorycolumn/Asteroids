@@ -48,9 +48,6 @@ class Asteroid(GameObject):
         self.rotation_angle = choice([num for num in range(-20, 20) if num])
         super().__init__(position, sprite, velocity)
 
-    def move(self, surface):
-        super().move(surface)
-
     def draw(self, surface):
         self.direction.rotate_ip(self.rotation_angle)
         super().draw_with_rotation(surface)
@@ -79,6 +76,7 @@ class Ship(GameObject):
             "fast_shoot": False,
             "triple_shoot": False,
             "piercing_shoot": False,
+            "boomerang_shoot": True,
 
         }
 
@@ -104,6 +102,8 @@ class Ship(GameObject):
     def shoot(self):
         if self.powerups["triple_shoot"]:
             self.shoot_triple()
+        elif self.powerups["boomerang_shoot"]:
+            self.shoot_boomerang()
         else:
             self.shoot_simple()
 
@@ -113,6 +113,18 @@ class Ship(GameObject):
 
         bullet_velocity = self.direction * bullet_speed + self.velocity
         bullet = Bullet(self.position, bullet_velocity)
+        self.create_bullet_cb(bullet)
+
+    def shoot_boomerang(self):
+
+        print(self.direction)
+        print(self.direction[0]*self.direction[1])
+
+        bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_shoot"] else self.BULLET_SPEED
+
+        bullet_velocity = self.direction * bullet_speed + self.velocity
+        bullet = Bullet(self.position, bullet_velocity, "boomerang", self.direction)
+
         self.create_bullet_cb(bullet)
 
     def shoot_triple(self):
@@ -139,11 +151,22 @@ class Ship(GameObject):
 
 
 class Bullet(GameObject):
-    def __init__(self, position, velocity):
-        super().__init__(position, load_sprite("bullet"), velocity)
+    def __init__(self, position, velocity, type="bullet", direction=0):
+        self.type = type
+        if (type == "boomerang"):
+            self.direction = Vector2(*direction)
+
+        super().__init__(position, load_sprite(type), velocity)
 
     def move(self, surface):
         self.position = self.position + self.velocity
+
+    def draw(self, surface):
+        if self.type == "boomerang":
+
+            super().draw_with_rotation(surface)
+        else:
+            super().draw(surface)
 
 
 class Powerup(GameObject):
@@ -153,7 +176,7 @@ class Powerup(GameObject):
         3: {"label": "shoot", "name": "fast_shoot"},
         4: {"label": "shoot", "name": "triple_shoot"},
         5: {"label": "shoot", "name": "piercing_shoot"},
-        6: {"label": "shoot", "name": "plasma_shoot"},
+        6: {"label": "shoot", "name": "boomerang_shoot"},
     }
 
     def __init__(self):
