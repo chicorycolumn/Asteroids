@@ -74,16 +74,26 @@ class Asteroids:
         if self.ship:
             for asteroid in self.asteroids:
                 if asteroid.collides_with(self.ship):
-                    self.ship = None
-                    break
+                    if self.ship.powerups["shield"]:
+                        self.ship.powerups["shield"] = False
+                        self.ship.sprite = load_sprite(self.ship.sprites["normal"])
+                        break
+                    else:
+                        self.ship = None
+                        break
 
             for powerup in self.powerups:
                 if powerup.collides_with(self.ship):
-                    self.ship.powerups[powerup.properties["name"]] = True
+                    powerup_name = powerup.properties["name"]
+
+                    if powerup_name == "shield":
+                        self.ship.sprite = load_sprite(self.ship.sprites["shielded"])
+
+                    self.ship.powerups[powerup_name] = True
                     self.powerups.remove(powerup)
                     break
 
-            if not len(self.powerups) and int(str(time.time())[-3:]) < 20:
+            if not len(self.powerups) and int(str(time.time())[-3:]) < 100:
                 while True:
                     position = get_random_position(self.screen)
                     if (

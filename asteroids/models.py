@@ -2,6 +2,7 @@ from pygame.math import Vector2
 from pygame.transform import rotozoom
 from utils import load_sprite, wrap_position, decelerate, get_random_position, get_random_velocity
 from random import randint, choice
+import copy
 
 UP = Vector2(0, -1)
 
@@ -68,6 +69,10 @@ class Ship(GameObject):
     MANOEUVRABILITY = 7
     ACCELERATION = 0.75
     BULLET_SPEED = 10
+    sprites = {
+        "normal": "spaceship",
+        "shielded": "spaceship_shielded",
+    }
 
     def __init__(self, position, create_bullet_cb):
         self.create_bullet_cb = create_bullet_cb
@@ -80,7 +85,7 @@ class Ship(GameObject):
             "boomerang_shoot": False,
         }
 
-        sprite = load_sprite("spaceship")
+        sprite = load_sprite(self.sprites["normal"])
 
         super().__init__(position, sprite, Vector2(0))
 
@@ -102,8 +107,6 @@ class Ship(GameObject):
     def shoot(self):
         if self.powerups["triple_shoot"]:
             self.shoot_triple()
-        elif self.powerups["boomerang_shoot"]:
-            self.shoot_boomerang()
         else:
             self.shoot_simple()
 
@@ -112,19 +115,7 @@ class Ship(GameObject):
         bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_shoot"] else self.BULLET_SPEED
 
         bullet_velocity = self.direction * bullet_speed + self.velocity
-        bullet = Bullet(self.position, bullet_velocity)
-        self.create_bullet_cb(bullet)
-
-    def shoot_boomerang(self):
-
-        print(self.direction)
-        print(self.direction[0]*self.direction[1])
-
-        bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_shoot"] else self.BULLET_SPEED
-
-        bullet_velocity = self.direction * bullet_speed + self.velocity
-        bullet = Bullet(self.position, bullet_velocity, "boomerang", self.direction)
-
+        bullet = Bullet(self.position, bullet_velocity, copy.copy(self.powerups), self.direction)
         self.create_bullet_cb(bullet)
 
     def shoot_triple(self):
@@ -140,10 +131,10 @@ class Ship(GameObject):
                     else Vector2([direction[0] - 0.5, direction[1]])
 
         bullet_velocity_L = chiralise_direction(self.direction, True) * (bullet_speed * 1.15) + self.velocity
-        bullet_L = Bullet(self.position, bullet_velocity_L)
+        bullet_L = Bullet(self.position, bullet_velocity_L, copy.copy(self.powerups), self.direction)
 
         bullet_velocity_R = chiralise_direction(self.direction, False) * (bullet_speed * 1.15) + self.velocity
-        bullet_R = Bullet(self.position, bullet_velocity_R)
+        bullet_R = Bullet(self.position, bullet_velocity_R, copy.copy(self.powerups), self.direction)
 
         self.create_bullet_cb(bullet_L)
         self.create_bullet_cb(bullet_R)
@@ -151,19 +142,20 @@ class Ship(GameObject):
 
 
 class Bullet(GameObject):
-    def __init__(self, position, velocity, type="bullet", direction=0):
-        self.type = type
-        if (type == "boomerang"):
+    def __init__(self, position, velocity, powerups, direction=0):
+        self.powerups = powerups
+        if self.powerups["boomerang_shoot"]:
             self.direction = Vector2(*direction)
 
-        super().__init__(position, load_sprite(type), velocity)
+        sprite_name = "boomerang" if self.powerups["boomerang_shoot"] else "bullet"
+
+        super().__init__(position, load_sprite(sprite_name), velocity)
 
     def move(self, surface):
         self.position = self.position + self.velocity
 
     def draw(self, surface):
-        if self.type == "boomerang":
-
+        if self.powerups["boomerang_shoot"]:
             super().draw_with_rotation(surface)
         else:
             super().draw(surface)
@@ -179,8 +171,8 @@ class Powerup(GameObject):
         6: {"label": "shoot", "name": "boomerang_shoot"},
     }
 
-    def __init__(self, position):
-        self.type = randint(1, 6)
+    def __init__(self, position, type=None):
+        self.type = type if type else randint(1, 6)
         self.properties = self.powerups_ref[self.type]
         sprite = rotozoom(load_sprite(f"powerup_{self.type}"), 0, 2)
         super().__init__(position, sprite)
