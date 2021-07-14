@@ -93,16 +93,19 @@ class Asteroids:
                     self.powerups.remove(powerup)
                     break
 
-            if not len(self.powerups) and int(str(time.time())[-3:]) < 100:
-                while True:
-                    position = get_random_position(self.screen)
-                    if (
-                            position.distance_to(self.ship.position)
-                            > self.MIN_ASTEROID_DISTANCE
-                    ):
-                        break
+            def generate_powerup():
+                if not len(self.powerups) and int(str(time.time())[-3:]) < 100:
+                    while True:
+                        position = get_random_position(self.screen)
+                        if (
+                                position.distance_to(self.ship.position)
+                                > self.MIN_ASTEROID_DISTANCE
+                        ):
+                            break
 
-                self.powerups.append(Powerup(position))
+                    self.powerups.append(Powerup(position))
+
+            generate_powerup()
 
         for bullet in self.bullets[:]:
             if not self.screen.get_rect().collidepoint(bullet.position):
@@ -135,4 +138,17 @@ class Asteroids:
         for g_obj in self.get_game_objects():
             g_obj.draw(self.screen)
         pygame.display.flip()
+
+        white = (255, 255, 255)
+        green = (0, 255, 0)
+        blue = (0, 0, 128)
+        X = 200
+        Y = 200
+        # display_surface = pygame.display.set_mode((X, Y))
+        font = pygame.font.Font('freesansbold.ttf', 64)
+        text = font.render('GeeksForGeeks', True, white, white)
+        textRect = text.get_rect()
+        textRect.center = (X // 2, Y // 2)
+        self.screen.blit(text, textRect)
+
         self.clock.tick(30)

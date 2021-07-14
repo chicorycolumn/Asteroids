@@ -60,9 +60,9 @@ class Asteroid(GameObject):
                 self.create_asteroid_cb(ast)
 
         if self.rank == 1:
-            explode_inner(2, self.rank + 1)
+            explode_inner(6, self.rank + 1)
         elif self.rank == 2:
-            explode_inner(4, self.rank + 1)
+            explode_inner(12, self.rank + 1)
 
 
 class Ship(GameObject):
@@ -101,7 +101,7 @@ class Ship(GameObject):
         self.velocity += self.direction * self.ACCELERATION
 
     def move(self, surface):
-        decelerate(self.velocity)
+        decelerate(self.velocity, 0.97)
         super().move(surface)
 
     def shoot(self):
@@ -172,7 +172,7 @@ class Powerup(GameObject):
     }
 
     def __init__(self, position, type=None):
-        self.type = type if type else randint(1, 6)
+        self.type = type if type else randint(3, 6)
         self.properties = self.powerups_ref[self.type]
         sprite = rotozoom(load_sprite(f"powerup_{self.type}"), 0, 2)
         super().__init__(position, sprite)
