@@ -32,7 +32,9 @@ def wrap_position(position, surface):
     return Vector2(x % w, y % h)
 
 
-def decelerate(vel, slow_factor=0.99):
+def decelerate(vel):
+    slow_factor = 0.97
+
     def slowed(point):
         return 0 if 0.01 > point > -0.01 else point * slow_factor
 

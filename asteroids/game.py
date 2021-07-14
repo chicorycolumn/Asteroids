@@ -64,8 +64,6 @@ class Asteroids:
                 self.ship.rotate(clockwise=False)
             elif is_key_pressed[pygame.K_UP]:
                 self.ship.accelerate()
-            # elif is_key_pressed[pygame.K_SPACE]:
-            #     self.ship.shoot()
 
     def _process_game_logic(self):
         for g_obj in self.get_game_objects():

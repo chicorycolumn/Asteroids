@@ -101,25 +101,10 @@ class Ship(GameObject):
         self.velocity += self.direction * self.ACCELERATION
 
     def move(self, surface):
-        decelerate(self.velocity, 0.97)
+        decelerate(self.velocity)
         super().move(surface)
 
     def shoot(self):
-        if self.powerups["triple_shoot"]:
-            self.shoot_triple()
-        else:
-            self.shoot_simple()
-
-    def shoot_simple(self):
-
-        bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_shoot"] else self.BULLET_SPEED
-
-        bullet_velocity = self.direction * bullet_speed + self.velocity
-        bullet = Bullet(self.position, bullet_velocity, copy.copy(self.powerups), self.direction)
-        self.create_bullet_cb(bullet)
-
-    def shoot_triple(self):
-
         bullet_speed = self.BULLET_SPEED * 2.5 if self.powerups["fast_shoot"] else self.BULLET_SPEED
 
         def chiralise_direction(direction, is_left):
@@ -130,15 +115,19 @@ class Ship(GameObject):
                 return Vector2([direction[0] + 0.5, direction[1]]) if is_left \
                     else Vector2([direction[0] - 0.5, direction[1]])
 
-        bullet_velocity_L = chiralise_direction(self.direction, True) * (bullet_speed * 1.15) + self.velocity
-        bullet_L = Bullet(self.position, bullet_velocity_L, copy.copy(self.powerups), self.direction)
+        if self.powerups["triple_shoot"]:
+            bullet_velocity_L = chiralise_direction(self.direction, True) * (bullet_speed * 1.15) + self.velocity
+            bullet_L = Bullet(self.position, bullet_velocity_L, copy.copy(self.powerups), self.direction)
 
-        bullet_velocity_R = chiralise_direction(self.direction, False) * (bullet_speed * 1.15) + self.velocity
-        bullet_R = Bullet(self.position, bullet_velocity_R, copy.copy(self.powerups), self.direction)
+            bullet_velocity_R = chiralise_direction(self.direction, False) * (bullet_speed * 1.15) + self.velocity
+            bullet_R = Bullet(self.position, bullet_velocity_R, copy.copy(self.powerups), self.direction)
 
-        self.create_bullet_cb(bullet_L)
-        self.create_bullet_cb(bullet_R)
-        self.shoot_simple()
+            self.create_bullet_cb(bullet_L)
+            self.create_bullet_cb(bullet_R)
+
+        bullet_velocity = self.direction * bullet_speed + self.velocity
+        bullet = Bullet(self.position, bullet_velocity, copy.copy(self.powerups), self.direction)
+        self.create_bullet_cb(bullet)
 
 
 class Bullet(GameObject):
