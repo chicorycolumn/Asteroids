@@ -2,8 +2,9 @@ import pygame
 from utils import load_sprite
 from models import GameObject
 import time
-from models import Ship, Asteroid, Powerup
+from models import Ship, Asteroid, Powerup, powerups_ref
 from utils import load_sprite, wrap_position, decelerate, get_random_position
+from random import choice
 
 
 class Asteroids:
@@ -92,7 +93,23 @@ class Asteroids:
                     break
 
             def generate_powerup():
-                if not len(self.powerups) and int(str(time.time())[-3:]) < 100:
+                probability = 100
+
+                if not len(self.powerups) and int(str(time.time())[-3:]) < probability:
+
+                    available_powerups = []
+
+                    for num in range(2, 6):
+                        name = powerups_ref[num]["name"]
+                        if not self.ship.powerups[name]:
+                            available_powerups.append(num)
+
+                    available_powerups = available_powerups * 3
+                    available_powerups.append(1)
+
+                    if len(available_powerups) == 1 and int(str(time.time())[-3:]) < (probability/2):
+                        return
+
                     while True:
                         position = get_random_position(self.screen)
                         if (
@@ -101,7 +118,7 @@ class Asteroids:
                         ):
                             break
 
-                    self.powerups.append(Powerup(position))
+                    self.powerups.append(Powerup(position, choice(available_powerups)))
 
             generate_powerup()
 
@@ -123,13 +140,11 @@ class Asteroids:
                     self.powerups.remove(powerup)
                     break
 
-
         for powerup in self.powerups[:]:
             for asteroid in self.asteroids[:]:
                 if powerup.collides_with(asteroid):
                     self.powerups.remove(powerup)
                     break
-
 
     def _draw(self):
         self.screen.blit(self.background, (0, 0))

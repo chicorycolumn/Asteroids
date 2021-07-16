@@ -150,18 +150,19 @@ class Bullet(GameObject):
             super().draw(surface)
 
 
-class Powerup(GameObject):
-    powerups_ref = {
-        1: {"label": "health", "name": "shield"},
-        2: {"label": "health", "name": "extra_life"},
-        3: {"label": "shoot", "name": "fast_shoot"},
-        4: {"label": "shoot", "name": "triple_shoot"},
-        5: {"label": "shoot", "name": "piercing_shoot"},
-        6: {"label": "shoot", "name": "boomerang_shoot"},
-    }
+powerups_ref = {
+    1: {"label": "health", "name": "extra_life"},
+    2: {"label": "health", "name": "shield"},
+    3: {"label": "shoot", "name": "fast_shoot"},
+    4: {"label": "shoot", "name": "triple_shoot"},
+    5: {"label": "shoot", "name": "piercing_shoot"},
+    6: {"label": "shoot", "name": "boomerang_shoot"},
+}
 
+
+class Powerup(GameObject):
     def __init__(self, position, type=None):
         self.type = type if type else randint(3, 6)
-        self.properties = self.powerups_ref[self.type]
+        self.properties = powerups_ref[self.type]
         sprite = rotozoom(load_sprite(f"powerup_{self.type}"), 0, 2)
         super().__init__(position, sprite)
