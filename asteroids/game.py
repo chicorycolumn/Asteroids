@@ -99,7 +99,7 @@ class Asteroids:
 
                     available_powerups = []
 
-                    for num in range(2, 6):
+                    for num in range(2, 7):
                         name = powerups_ref[num]["name"]
                         if not self.ship.powerups[name]:
                             available_powerups.append(num)
@@ -107,7 +107,7 @@ class Asteroids:
                     available_powerups = available_powerups * 3
                     available_powerups.append(1)
 
-                    if len(available_powerups) == 1 and int(str(time.time())[-3:]) < (probability/2):
+                    if len(available_powerups) == 1 and not (int(str(time.time())[-3:]) < (probability/3)):
                         return
 
                     while True:
